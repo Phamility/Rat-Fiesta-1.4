@@ -16,9 +16,12 @@ using Terraria.ModLoader;
 using IL.Terraria.GameContent.Personalities;
 using On.Terraria.GameContent.Personalities;
 using static Terraria.ModLoader.PlayerDrawLayer;
-using RatFiesta.Projectiles;
+using TenShadows.Projectiles;
+using TenShadows.Items.Materials;
+using IL.Terraria.GameContent.UI.ResourceSets;
+using TenShadows.Items.Accessories;
 
-namespace RatFiesta.NPCS
+namespace TenShadows.NPCS
 {
     [AutoloadBossHead]
     public class Nue : ModNPC
@@ -34,51 +37,45 @@ namespace RatFiesta.NPCS
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
         }
+        public override void BossHeadSlot(ref int index)
+        {
+            base.BossHeadSlot(ref index);
+        }
 
         public override void SetDefaults()
         {
+
             NPCID.Sets.CantTakeLunchMoney[Type] = true;
             NPCID.Sets.DontDoHardmodeScaling[Type] = true;
             NPCID.Sets.BossBestiaryPriority.Add(Type);
             NPCID.Sets.MPAllowedEnemies[Type] = true;
             NPC.BossBar = ModContent.GetInstance<ExampleBossBar>();
-            NPC.value = Item.buyPrice(gold: 5);
+            NPC.value = 30000;
             NPC.SpawnWithHigherTime(30);
             NPC.boss = true;
             NPC.npcSlots = 10f;
             NPC.scale = 2.5f;
             NPC.width = 18;
             NPC.height = 40;
-            NPC.damage = 8;
-            NPC.defense = 8;
-            NPC.lifeMax = 700;
+            NPC.damage = 7;
+            NPC.defense = 7;
+            NPC.lifeMax = 750;
             if (!Main.dedServ)
             {
                 Music = MusicID.Boss5;
             }
             NPC.HitSound = SoundID.DD2_LightningAuraZap;
             NPC.DeathSound = SoundID.Thunder;
-            NPC.value = 60f;
             NPC.knockBackResist = 0.3f;
             NPC.aiStyle = 14; // Fighter AI, important to choose the aiStyle that matches the NPCID that we want to mimic
-          //  NPC.noTileCollide = true;
+                              //  NPC.noTileCollide = true;
             AIType = NPCID.GiantFlyingFox; // Use vanilla zombie's type when executing AI code. (This also means it will try to despawn during daytime)
             AnimationType = NPCID.GiantFlyingFox; // Use vanilla zombie's type when executing animation code. Important to also match Main.npcFrameCount[NPC.type] in SetStaticDefaults.
             //Banner = Item.NPCtoBanner(NPCID.Zombie); // Makes this NPC get affected by the normal zombie banner.
             //BannerItem = Item.BannerToItem(Banner); // Makes kills of this NPC go towards dropping the banner it's associated with.
         }
 
-        public override void ModifyNPCLoot(NPCLoot npcLoot)
-        {
-
-            // (2) This example shows recreating the drops. This code is commented out because we are using the previous method instead.
-            // npcLoot.Add(ItemDropRule.Common(ItemID.Shackle, 50)); // Drop shackles with a 1 out of 50 chance.
-            // npcLoot.Add(ItemDropRule.Common(ItemID.ZombieArm, 250)); // Drop zombie arm with a 1 out of 250 chance.
-            //			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Placeable.Furniture.MinionBossTrophy>(), 10));
-
-            // Finally, we can add additional drops. Many Zombie variants have their own unique drops: https://terraria.fandom.com/wiki/Zombie
-            npcLoot.Add(ItemDropRule.Common(ItemID.StoneBlock, 2)); // 1% chance to drop Confetti
-        }
+    
 
         /* public override float SpawnChance(NPCSpawnInfo spawnInfo)
          {
@@ -90,10 +87,10 @@ namespace RatFiesta.NPCS
             // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
 				// Sets the spawning conditions of this NPC that is listed in the bestiary.
-                                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
+                           //     BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("electric birb"),
+				new FlavorTextBestiaryInfoElement("An ancient electric bird that lays dormant in the shadows, terrorizing thousands for generations."),
 
 				// By default the last added IBestiaryBackgroundImagePathAndColorProvider will be used to show the background image.
 				// The ExampleSurfaceBiome ModBiomeBestiaryInfoElement is automatically populated into bestiaryEntry.Info prior to this method being called
@@ -117,12 +114,30 @@ namespace RatFiesta.NPCS
                 dust.scale *= 1f + Main.rand.NextFloat(-0.03f, 0.03f);
             }
         }
-                private int timer;
+        private int timer;
+        private int timer2;
+
         private int Rage;
 
+        private int Positive;
+        private int timer3 = 0;
         public override void AI()
         {
-            if(NPC.life < 400)
+            NPC.noTileCollide = true;
+
+            Player player = Main.player[NPC.target];
+            
+            if (player.dead)
+            {
+                // If the targeted player is dead, flee
+                NPC.velocity.Y -= 0.075f;
+                // This method makes it so when the boss is in "despawn range" (outside of the screen), it despawns in 10 ticks
+                NPC.EncourageDespawn(10);
+                return;
+            }
+            NPC.damage = 7;
+
+            if (NPC.life <= 600)
             {
                 Rage = 2;
             }
@@ -130,11 +145,46 @@ namespace RatFiesta.NPCS
             {
                 Rage = 1;
             }
-
+            timer2 += Rage;
             timer += Rage;
-            if (timer >= 36)
+            if (Main.expertMode == true)
             {
-                Vector2 position = NPC.position - new Vector2(Main.rand.Next(-600, 600), 600);
+                if (NPC.life <= 1000)
+                {
+                    if (timer2 >= 4)
+                    {
+                        var entitySource = NPC.GetSource_FromAI();
+                        int type = ModContent.ProjectileType<NueAggFeather>();
+                        int damage = NPC.damage;
+
+                        if (Main.rand.Next(1, 3) == 2)
+                        {
+                            Positive = 1;
+                        }
+                        else
+                        {
+                            Positive = -1;
+                        }
+                        Vector2 position2 = NPC.position - new Vector2(Main.rand.Next(600,700) * Positive, 600);
+                        if (Rage == 2)
+                        {
+                            Vector2 position3 = NPC.position - new Vector2(Main.rand.Next(650, 750)/ Rage * Positive, 600);
+
+                            Projectile.NewProjectile(entitySource, position3, -Vector2.UnitY, type, damage, 0f, Main.myPlayer);
+
+                        }
+
+
+
+                        Projectile.NewProjectile(entitySource, position2, -Vector2.UnitY, type, damage, 0f, Main.myPlayer);
+
+                        timer2 = 0;
+                    }
+                }
+            }
+            if (timer >= 38)
+            {
+                Vector2 position = NPC.position - new Vector2(Main.rand.Next(-750, 750), 600);
 
                 var entitySource = NPC.GetSource_FromAI();
                 int type = ModContent.ProjectileType<NueLightning>();
@@ -149,7 +199,7 @@ namespace RatFiesta.NPCS
 
 
 
-            if (Main.rand.Next(1, 500) == 2)
+            if (Main.rand.Next(1, 600) == 2)
             {
                 SoundEngine.PlaySound(SoundID.Thunder, NPC.position);
 
@@ -177,6 +227,8 @@ namespace RatFiesta.NPCS
 
         public override void OnKill()
         {
+            NPC.SetEventFlagCleared(ref DownedBossSystem.downedNue, -1);
+
             for (int i = 0; i < 30; i++)
             {
                 int dustType = 272;
@@ -202,7 +254,30 @@ namespace RatFiesta.NPCS
             target.AddBuff(buffType, timeToAdd);
         }
 
+        public override void ModifyNPCLoot(NPCLoot npcLoot)
+        {
+            // Do NOT misuse the ModifyNPCLoot and OnKill hooks: the former is only used for registering drops, the latter for everything else
 
+            // Add the treasure bag using ItemDropRule.BossBag (automatically checks for expert mode)
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<NueBossBag>()));
 
+            // Trophies are spawned with 1/10 chance
+            // ItemDropRule.MasterModeCommonDrop for the relic
+          //  npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeable.Furniture.MinionBossRelic>()));
+
+            // ItemDropRule.MasterModeDropOnAllPlayers for the pet
+           // npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<MinionBossPetItem>(), 4));
+
+            // All our drops here are based on "not expert", meaning we use .OnSuccess() to add them into the rule, which then gets added
+            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert());
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<NueFeather>(), 1, 10, 20));
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<NueLucky>(), 3));
+            npcLoot.Add(notExpertRule);
+
+            // Notice we use notExpertRule.OnSuccess instead of npcLoot.Add so it only applies in normal mode
+            // Boss masks are spawned with 1/7 chance
+            //  notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<MinionBossMask>(), 7));
+
+        }
     }
 }

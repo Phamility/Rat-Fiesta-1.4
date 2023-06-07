@@ -10,7 +10,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.GameContent.UI.BigProgressBar;
 
-namespace RatFiesta.NPCS
+namespace TenShadows.NPCS
 {
     // Showcases a custom boss bar with basic logic for displaying the icon, life, and shields properly.
     // Has no custom texture, meaning it will use the default vanilla boss bar texture
