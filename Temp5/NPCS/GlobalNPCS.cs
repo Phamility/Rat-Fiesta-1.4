@@ -1,0 +1,135 @@
+﻿using Terraria;
+using Terraria.GameContent.ItemDropRules;
+using Terraria.ID;
+using Terraria.ModLoader;
+using System.Linq;
+using TenShadows.Items.Materials;
+using TenShadows.Items.Techniques;
+using TenShadows.Projectiles;
+using TenShadows.Items.Accessories.Eyes;
+
+namespace TenShadows.NPCS
+{
+    public class GlobalNPCS : GlobalNPC
+    {
+        public override void OnKill(NPC npc)
+        {
+            if ( npc.boss== true )
+            {
+                DogSummon.KYS = true;
+                DogSummon2.KYS = true;
+
+            }
+
+
+
+
+        }
+        public override void ModifyNPCLoot(NPC npc, NPCLoot npcLoot)
+        {
+            if (npc.type == NPCID.AngryBones || npc.type == NPCID.DarkCaster || npc.type == NPCID.CursedSkull
+                || npc.type == NPCID.Skeleton || npc.type == NPCID.AngryBonesBig)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<HeavenlyPhysical>(), 100, 1));
+
+            }
+            if (npc.type == NPCID.BlueSlime || npc.type == NPCID.GreenSlime)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CursedEnergy>(), 50, 1, 4));
+
+            }
+            if (npc.type == NPCID.Zombie || npc.type == NPCID.DemonEye)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CursedEnergy>(), 25, 4, 7));
+
+            }
+            if (npc.type == NPCID.BloodZombie || npc.type == NPCID.Drippler)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CursedEnergy>(), 15, 7, 10));
+
+            }
+            if (npc.type == NPCID.FaceMonster || npc.type == NPCID.EaterofSouls || npc.type == NPCID.Crimera)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CursedEnergy>(), 20, 7, 10));
+
+            }
+            if (npc.type == NPCID.Shark)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FishEye>(), 4, 1));
+
+            }
+            if (npc.type == NPCID.BlueJellyfish || npc.type == NPCID.GreenJellyfish || npc.type == NPCID.PinkJellyfish)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FishEye>(), 50, 1));
+
+            }
+            if (npc.type == NPCID.PossessedArmor || npc.type == NPCID.WanderingEye || npc.type == NPCID.Demon)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CursedEnergy>(), 20, 10, 16));
+
+            }
+            if (npc.type == NPCID.Demon || npc.type == NPCID.VoodooDemon)
+            {
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Horn>(), 5));
+
+            }
+            if (npc.type == NPCID.WallofFlesh)
+            {
+                LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert());
+
+                notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RestlessGambler>(), 5));
+
+                npcLoot.Add(notExpertRule);
+            }
+            if (npc.type == NPCID.EyeofCthulhu)
+            {
+                LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert());
+
+                notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<FlowingRed>(), 3));
+                notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<EyeEye>(), 3));
+
+
+                npcLoot.Add(notExpertRule);
+            }
+            if (npc.type == NPCID.KingSlime)
+            {
+                LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert());
+
+                notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<PiercingBlood>(), 3));
+
+                npcLoot.Add(notExpertRule);
+            }
+
+        }
+    }
+    public class GlobalItems : GlobalItem
+    {
+
+
+
+        public override void ModifyItemLoot(Item item, ItemLoot itemLoot)
+        {
+            // In addition to this code, we also do similar code in Common/GlobalNPCs/ExampleNPCLoot.cs to edit the boss loot for non-expert drops. Remember to do both if your edits should affect non-expert drops as well.
+            if (item.type == ItemID.WallOfFleshBossBag)
+            {
+                itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<RestlessGambler>(), 4));
+
+            }
+            if (item.type == ItemID.EyeOfCthulhuBossBag)
+            {
+                itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<FlowingRed>(),2));
+                itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<EyeEye>(), 2));
+
+
+            }
+            if (item.type == ItemID.KingSlimeBossBag)
+            {
+                itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<PiercingBlood>(), 2));
+
+
+            }
+        }
+    }
+    
+}
+
