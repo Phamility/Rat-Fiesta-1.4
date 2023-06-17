@@ -1,0 +1,77 @@
+
+Mods: {
+	TenShadows: {
+		Items: {
+			NueLucky: {
+				DisplayName: Nue's Lucky Feathers
+				Tooltip:
+					'''
+					2 defense
+					Increases max health by 20
+					Increases max mana by 20 
+					'''
+			}
+
+			NueMask: {
+				DisplayName: Nue's Mask
+				Tooltip:
+					'''
+					Periodically rain down lightning orbs that deal a burst of damage!
+					1 defense
+					'''
+			}
+
+			NueWings: {
+				DisplayName: Nue's Wings
+				Tooltip:
+					'''
+					Take flight!
+					They're weak but they'll work.
+					'''
+			}
+
+			NueBossBag: {
+				DisplayName: Treasure Bag (Nue)
+				Tooltip: Right Click to open
+			}
+
+			NueFeather: {
+				DisplayName: Nue's Feather
+				Tooltip: A feather of an electric birb.
+			}
+
+			NueSummon: {
+				DisplayName: Bird Silhouette
+				Tooltip:
+					'''
+					Summons Nue
+					Doesn't consume on use
+					'''
+			}
+
+			Shadow: {
+				DisplayName: Cursed Shadow
+				Tooltip: With proper technique, it can be wielded.
+			}
+
+			NuesNovel: {
+				DisplayName: Nue's Novel
+				Tooltip: Rain a barrage of feathers from the sky!
+			}
+
+			VanillasWrath: {
+				DisplayName: Vanilla's Wrath
+				Tooltip: Tear through reality and unleash utter chaos!
+			}
+		}
+
+		NPCs.Nue.DisplayName: Nue
+
+		Projectiles: {
+			NueAggFeather.DisplayName: Nue's Feather
+			NueFriendlyFeather.DisplayName: Bomb
+			NueLightning.DisplayName: Nue's Lightning
+			NueLightningFriendly.DisplayName: Lightning Ball
+		}
+	}
+}
